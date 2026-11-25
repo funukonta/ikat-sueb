@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F8F5; --surface: #FFFFFF; --subtle: #EEF2EC;
+    --primary: #15803D; --primary-dark: #14532D; --primary-soft: #DCFCE7; --primary-border: #86EFAC;
+    --text: #11181C; --text-2: #52605A; --muted: #7E8C85;
+    --border: #DCE3DD; --border-strong: #BFCBC2; --danger: #B42318;
+    --shadow: 0 2px 8px rgba(17, 24, 28, .05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    max-width: 480px; margin: 0 auto; position: relative;
+  }
+  button { font: inherit; color: inherit; border: none; background: none; cursor: pointer; }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--primary-border); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  .view { min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* ---------- List ---------- */
+  .list-body { padding: 28px 20px 120px; display: flex; flex-direction: column; gap: 20px; }
+  .eyebrow { display: flex; justify-content: space-between; align-items: center; }
+  .eyebrow b { color: var(--primary); font-size: 12px; font-weight: 800; letter-spacing: 1.4px; }
+  .pill { background: var(--subtle); color: var(--text-2); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+  h1 { font-size: 28px; font-weight: 800; letter-spacing: -.6px; line-height: 34px; margin-top: 4px; }
+  .sub { color: var(--text-2); font-size: 14px; line-height: 20px; margin-top: 4px; }
+  .cards { display: flex; flex-direction: column; gap: 12px; }
+  .card {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 16px 14px 16px 16px; box-shadow: var(--shadow);
+  }
+  .card:active { background: var(--subtle); }
+  .card.new { border: 1.5px solid var(--primary-border); }
+  .card .ic { width: 44px; height: 44px; border-radius: 12px; background: var(--subtle); display: grid; place-items: center; flex: none; }
+  .card.new .ic { background: var(--primary-soft); }
+  .card .txt { flex: 1; min-width: 0; }
+  .card .t { font-size: 16px; font-weight: 600; line-height: 22px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card .m { font-size: 13px; font-weight: 500; color: var(--text-2); line-height: 18px; margin-top: 3px; display: flex; gap: 8px; align-items: center; }
+  .badge { background: var(--primary-soft); color: var(--primary); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+  .empty { text-align: center; color: var(--muted); padding: 48px 16px; font-size: 14px; line-height: 20px; }
+  .fab {
+    position: fixed; bottom: calc(28px + env(safe-area-inset-bottom)); right: max(24px, calc(50vw - 240px + 24px));
+    width: 62px; height: 62px; border-radius: 50%; background: var(--primary);
+    display: grid; place-items: center; box-shadow: 0 8px 20px rgba(21, 128, 61, .3);
+  }
+  .fab:active { background: var(--primary-dark); }
+
+  /* ---------- Step ---------- */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; gap: 12px; }
+  .back { width: 44px; height: 44px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; flex: none; }
+  .title { text-align: center; min-width: 0; }
+  .title h2 { font-size: 20px; font-weight: 800; letter-spacing: -.3px; line-height: 24px; }
+  .title p { font-size: 12px; font-weight: 500; color: var(--muted); line-height: 16px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .step-pill { background: var(--primary-soft); color: var(--primary); font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 999px; flex: none; min-width: 44px; text-align: center; }
+
+  .form { padding: 12px 20px 140px; display: flex; flex-direction: column; gap: 28px; }
+  .summary { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--subtle); border-radius: 12px; padding: 12px 14px; font-size: 13px; }
+  .summary span { display: flex; align-items: center; gap: 8px; color: var(--text-2); font-weight: 600; }
+  .summary b { color: var(--primary-dark); font-weight: 700; white-space: nowrap; }
+  .field { display: flex; flex-direction: column; gap: 12px; }
+  .label { display: flex; justify-content: space-between; align-items: center; }
+  .label b { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .label small { font-size: 13px; font-weight: 600; color: var(--primary); }
+  .label small.muted { color: var(--muted); font-size: 12px; font-weight: 500; }
+
+  .chips { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .chip {
+    height: 58px; border-radius: 14px; background: var(--surface); border: 1.2px solid var(--border);
+    font-size: 20px; font-weight: 600;
+  }
+  .chip[aria-pressed="true"] { background: var(--primary); border: 1.5px solid var(--primary-dark); color: #fff; font-weight: 700; box-shadow: var(--shadow); }
+
+  .weight {
+    background: var(--surface); border: 1.5px solid var(--border-strong); border-radius: 22px; box-shadow: var(--shadow);
+    padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: text;
+  }
+  .weight:focus-within { border-color: var(--primary); }
+  .weight .val { display: flex; align-items: baseline; gap: 8px; justify-content: center; }
+  .weight input {
+    font: inherit; font-size: 58px; font-weight: 800; letter-spacing: -2px; color: var(--text);
+    border: none; outline: none; background: transparent; text-align: right; width: 4.2ch; min-width: 1.2ch;
+  }
+  .weight input::placeholder { color: var(--border-strong); }
+  .weight .unit { font-size: 26px; font-weight: 600; color: var(--text-2); }
+  .hint { background: var(--subtle); color: var(--text-2); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 999px; }
+  .quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .quick button { height: 44px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); font-size: 13px; font-weight: 600; color: var(--text-2); }
+  .quick button:active, .chip:active { transform: scale(.97); }
+
+  .history { display: flex; flex-direction: column; gap: 8px; }
+  .history h3 { font-size: 13px; font-weight: 700; color: var(--text-2); }
+  .row { display: flex; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; font-size: 14px; }
+  .row span:first-child { color: var(--muted); font-weight: 600; }
+  .row span:last-child { font-weight: 600; }
+
+  .actions {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px;
+    display: flex; gap: 12px; padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+    background: var(--surface); border-top: 1px solid var(--border);
+  }
+  .btn { flex: 1; height: 54px; border-radius: 14px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn.secondary { background: var(--surface); border: 1.5px solid var(--border-strong); }
+  .btn.primary { background: var(--primary); color: #fff; box-shadow: var(--shadow); }
+  .btn.primary:active { background: var(--primary-dark); }
+  .btn:disabled { opacity: .5; cursor: default; }
+
+  /* ---------- Feedback ---------- */
+  .toast {
+    position: fixed; left: 50%; bottom: 112px; transform: translateX(-50%); z-index: 10;
+    background: var(--text); color: #fff; font-size: 14px; font-weight: 600; padding: 10px 16px; border-radius: 12px;
+    max-width: calc(100% - 40px); box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
+  }
+  .toast.error { background: var(--danger); }
+  .loading { padding: 48px 0; text-align: center; color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- ============ Daftar Sesi ============ -->
+<section id="listView" class="view">
+  <div class="list-body">
+    <header>
+      <div class="eyebrow"><b>IKAT</b><span class="pill" id="count">… sesi</span></div>
+      <h1>Daftar Sesi</h1>
+      <p class="sub" id="listSub">Pilih sesi atau tekan + untuk mulai timbangan baru</p>
+    </header>
+    <div class="cards" id="cards"><p class="loading">Memuat sesi…</p></div>
+  </div>
+  <button class="fab" id="fab" aria-label="Sesi baru">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 5.5v15M5.5 13h15" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+  </button>
+</section>
+
+<!-- ============ Step X ============ -->
+<section id="stepView" class="view" hidden>
+  <div class="topbar">
+    <button class="back" id="back" aria-label="Kembali">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 5l-5 5 5 5" stroke="#11181C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="title"><h2 id="stepTitle">step 1</h2><p id="sessionName">sesi baru</p></div>
+    <span class="step-pill" id="stepPill">#1</span>
+  </div>
+
+  <div class="form">
+    <div class="summary" id="summary" hidden>
+      <span>
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><path d="M3.75 9.5 7.25 13l7-7.5" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="sumLabel"></span>
+      </span>
+      <b id="sumValue"></b>
+    </div>
+
+    <div class="field">
+      <div class="label"><b>jumlah ikat</b><small id="ikatLabel">pilih jumlah</small></div>
+      <div class="chips" id="chips" role="group" aria-label="Jumlah ikat"></div>
+    </div>
+
+    <div class="field">
+      <div class="label">
+        <b><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="3" stroke="#52605A" stroke-width="1.5"/><path d="M6.5 9.5C7.3 8 8.6 7.2 10 7.2s2.7.8 3.5 2.3" stroke="#52605A" stroke-width="1.5" stroke-linecap="round"/><path d="M10 11l1.8-2.4" stroke="#15803D" stroke-width="1.6" stroke-linecap="round"/></svg>berat</b>
+        <small class="muted">Kilogram (kg)</small>
+      </div>
+      <label class="weight" for="berat">
+        <span class="val"><input id="berat" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Berat dalam kg"><span class="unit">kg</span></span>
+        <span class="hint">Ketuk angka untuk ubah</span>
+      </label>
+      <div class="quick">
+        <button data-d="-5">-5 kg</button><button data-d="-1">-1 kg</button>
+        <button data-d="1">+1 kg</button><button data-d="5">+5 kg</button>
+      </div>
+    </div>
+
+    <div class="history" id="history" hidden>
+      <h3>Riwayat step</h3>
+      <div id="historyRows"></div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn secondary" id="finish">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.75 9.5 7.25 13l7-7.5" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>finish
+    </button>
+    <button class="btn primary" id="next">
+      next<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.75 9h10.5M10 4.75 14.25 9 10 13.25" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</section>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const fmt = n => Number(n).toLocaleString('id-ID', { maximumFractionDigits: 2 });
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const call = (fn, ...args) => new Promise((resolve, reject) =>
+    google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[fn](...args));
+
+  // session: null for a new session (tab is created on the first saved step)
+  const state = { session: null, steps: [], ikat: null, busy: false, highlight: null };
+
+  let toastTimer;
+  function toast(msg, isError) {
+    const t = $('toast');
+    t.textContent = msg; t.className = 'toast' + (isError ? ' error' : ''); t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 2600);
+  }
+
+  /* ---------- List ---------- */
+  async function showList() {
+    $('stepView').hidden = true; $('listView').hidden = false;
+    window.scrollTo(0, 0);
+    try {
+      renderList(await call('listSessions'));
+    } catch (e) {
+      $('cards').innerHTML = '<p class="empty">Gagal memuat sesi.<br>' + esc(e.message) + '</p>';
+    }
+  }
+
+  function renderList(sessions) {
+    $('count').textContent = sessions.length + ' sesi';
+    $('listSub').textContent = state.highlight
+      ? state.highlight.charAt(0).toUpperCase() + state.highlight.slice(1) + ' berhasil disimpan'
+      : 'Pilih sesi atau tekan + untuk mulai timbangan baru';
+    if (!sessions.length) {
+      $('cards').innerHTML = '<p class="empty">Belum ada sesi.<br>Tekan + untuk mulai timbangan baru.</p>';
+      return;
+    }
+    $('cards').innerHTML = sessions.map(s => {
+      const isNew = s.name === state.highlight;
+      return `<button class="card${isNew ? ' new' : ''}" data-name="${esc(s.name)}">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4.5" width="14" height="12.5" rx="2.5" stroke="#15803D" stroke-width="1.6"/><path d="M6.5 2.5v3M13.5 2.5v3M3 8.5h14" stroke="#15803D" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+        <span class="txt"><span class="t" style="display:block">${esc(s.name)}</span>
+          <span class="m">${isNew ? '<span class="badge">Baru</span>' : ''}${s.steps} step · ${fmt(s.totalKg)} kg · ${s.totalIkat} ikat</span></span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="#7E8C85" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>`;
+    }).join('');
+  }
+
+  $('cards').addEventListener('click', async e => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    try {
+      const s = await call('getSession', card.dataset.name);
+      openStep(s.name, s.stepList);
+    } catch (err) { toast(err.message, true); }
+  });
+  $('fab').addEventListener('click', () => openStep(null, []));
+
+  /* ---------- Step X ---------- */
+  function openStep(session, steps) {
+    state.session = session; state.steps = steps;
+    state.ikat = steps.length ? steps[steps.length - 1].ikat : null;
+    $('berat').value = '';
+    $('listView').hidden = true; $('stepView').hidden = false;
+    window.scrollTo(0, 0);
+    renderStep();
+  }
+
+  function renderStep() {
+    const x = state.steps.length + 1;
+    $('stepTitle').textContent = 'step ' + x;
+    $('stepPill').textContent = '#' + x;
+    $('sessionName').textContent = state.session || 'sesi baru';
+
+    const n = state.steps.length;
+    $('summary').hidden = !n;
+    if (n) {
+      const kg = state.steps.reduce((a, s) => a + s.berat, 0);
+      const ikat = state.steps.reduce((a, s) => a + s.ikat, 0);
+      $('sumLabel').textContent = n + ' step tersimpan';
+      $('sumValue').textContent = ikat + ' ikat · ' + fmt(kg) + ' kg';
+    }
+
+    $('chips').innerHTML = [1, 2, 3, 4, 5].map(i =>
+      `<button class="chip" data-i="${i}" aria-pressed="${state.ikat === i}">${i}</button>`).join('');
+    $('ikatLabel').textContent = state.ikat ? state.ikat + ' ikat dipilih' : 'pilih jumlah';
+
+    $('history').hidden = !n;
+    $('historyRows').innerHTML = state.steps.slice().reverse().map(s =>
+      `<div class="row"><span>step ${s.step}</span><span>${s.ikat} ikat · ${fmt(s.berat)} kg</span></div>`).join('');
+    $('historyRows').style.cssText = 'display:flex;flex-direction:column;gap:8px';
+  }
+
+  $('chips').addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    state.ikat = Number(chip.dataset.i);
+    renderStep();
+  });
+
+  const parseBerat = () => parseFloat($('berat').value.replace(',', '.'));
+  $('berat').addEventListener('input', e => { e.target.value = e.target.value.replace(/[^\d.,]/g, ''); });
+  document.querySelector('.quick').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const v = Math.max(0, Math.round(((parseBerat() || 0) + Number(b.dataset.d)) * 100) / 100);
+    $('berat').value = String(v).replace('.', ',');
+  });
+
+  // Returns true if saved, false if nothing to save, throws on invalid input
+  async function saveCurrent() {
+    const berat = parseBerat();
+    if (!state.ikat) throw new Error('Pilih jumlah ikat dulu');
+    if (!(berat > 0)) throw new Error('Isi berat dulu');
+    const s = await call('addStep', state.session, state.ikat, berat);
+    state.session = s.name; state.steps = s.stepList;
+    return true;
+  }
+
+  async function withBusy(fn) {
+    if (state.busy) return;
+    state.busy = true; $('next').disabled = $('finish').disabled = true;
+    try { await fn(); }
+    catch (e) { toast(e.message, true); }
+    finally { state.busy = false; $('next').disabled = $('finish').disabled = false; }
+  }
+
+  // next: save this step, then step X + 1
+  $('next').addEventListener('click', () => withBusy(async () => {
+    await saveCurrent();
+    toast('Step ' + state.steps.length + ' tersimpan');
+    $('berat').value = '';
+    renderStep();
+    window.scrollTo(0, 0);
+  }));
+
+  // finish: save this step if filled in, then back to the list
+  $('finish').addEventListener('click', () => withBusy(async () => {
+    const filled = $('berat').value.trim() !== '';
+    if (filled) await saveCurrent();
+    else if (!state.steps.length) throw new Error('Isi minimal satu step dulu');
+    state.highlight = state.session;
+    await showList();
+  }));
+
+  $('back').addEventListener('click', () => {
+    if ($('berat').value.trim() && !confirm('Berat belum disimpan. Kembali tanpa menyimpan?')) return;
+    showList();
+  });
+
+  showList();
+</script>
+</body>
+</html>
